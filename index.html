@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#241b35">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon-192.png">
+<title>Meu Ponto</title>
+<style>
+:root{color-scheme:dark;--bg:#15121c;--panel:#211b2b;--panel2:#2b2338;--line:#40354f;--text:#f7f2ff;--muted:#b8acc8;--purple:#b58af5;--green:#8bd6ad;--red:#ff9b9b}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at top,#302342 0,#15121c 55%);color:var(--text);font:16px system-ui,-apple-system,Segoe UI,sans-serif;padding:env(safe-area-inset-top) 14px env(safe-area-inset-bottom)}
+main{max-width:760px;margin:auto;padding:20px 0 40px}.top{display:flex;align-items:center;justify-content:space-between;gap:12px}.brand{font-weight:800;letter-spacing:.04em}.pill{font-size:12px;color:var(--green);border:1px solid #47785d;padding:5px 9px;border-radius:30px}
+.card{background:#211b2beF;border:1px solid var(--line);border-radius:20px;padding:17px;margin-top:14px;box-shadow:0 12px 35px #0003}
+.clock{text-align:center;padding:18px 8px}.time{font-size:clamp(42px,12vw,64px);font-weight:750;letter-spacing:-.04em;font-variant-numeric:tabular-nums}.date{color:var(--muted);font-size:14px}
+h2{font-size:17px;margin:0 0 12px}button,select,input{font:inherit}button{border:0;border-radius:13px;padding:13px 15px;background:var(--purple);color:#1c1427;font-weight:750;cursor:pointer}button:disabled{opacity:.4;cursor:not-allowed}.primary{width:100%;padding:17px;font-size:17px;margin-top:12px}.secondary{background:var(--panel2);color:var(--text);border:1px solid var(--line)}.danger{background:#492b36;color:#ffd5d5}.row{display:flex;gap:9px;align-items:center;flex-wrap:wrap}.row>*{flex:1}
+.progress{height:8px;background:#40354f;border-radius:9px;overflow:hidden;margin:12px 0}.progress span{display:block;height:100%;background:var(--purple);width:0}
+.small{color:var(--muted);font-size:13px}.marks{display:grid;grid-template-columns:1fr 1fr;gap:9px}.mark{background:var(--panel2);border:1px solid var(--line);border-radius:13px;padding:11px}.mark.done{border-color:#47785d}.mark .label{font-size:12px;color:var(--muted)}.mark .value{font-size:20px;font-weight:700;margin-top:4px;font-variant-numeric:tabular-nums}.mark button{font-size:12px;padding:6px 9px;margin-top:8px;width:100%}
+select,input{background:var(--panel2);color:var(--text);border:1px solid var(--line);border-radius:10px;padding:10px;min-width:0}
+table{width:100%;border-collapse:collapse;font-size:13px;min-width:600px}th,td{padding:10px 8px;border-bottom:1px solid var(--line);text-align:center;white-space:nowrap}th:first-child,td:first-child{text-align:left;position:sticky;left:0;background:var(--panel)}th{color:var(--muted);font-weight:600}td button{padding:5px 8px;font-size:12px}
+.tablewrap{overflow-x:auto;border:1px solid var(--line);border-radius:12px}
+.notice{background:#33283f;border:1px solid #59476d;padding:11px;border-radius:12px;color:#e8dafa;font-size:13px;line-height:1.45}
+footer{text-align:center;color:var(--muted);font-size:12px;margin-top:20px}
+@media(min-width:560px){.marks{grid-template-columns:repeat(3,1fr)}}
+@media print{body{background:white;color:#111;padding:0}.card{background:white;color:#111;border:1px solid #aaa;box-shadow:none}.small,.date,footer,.top .pill,.noprint{display:none!important}.tablewrap{overflow:visible;border:0}table{min-width:0;font-size:10px}th,td{border:1px solid #bbb;color:#111;padding:6px}td:first-child,th:first-child{position:static;background:white}.card{break-inside:avoid}h2{color:#111}}
+</style>
+</head>
+<body>
+<main>
+ <div class="top"><div class="brand">✦ MEU PONTO</div><span class="pill">SALVO NESTE APARELHO</span></div>
+ <section class="card clock">
+  <div class="small">HORÁRIO DO SEU CELULAR</div><div class="time" id="clock">--:--:--</div><div class="date" id="today"></div>
+  <button class="primary" id="record">Registrar próximo ponto · agora</button>
+  <div class="small" id="nextLabel" style="margin-top:8px">O horário será capturado automaticamente.</div>
+ </section>
+ <section class="card">
+  <div class="row"><div><h2 id="dayTitle">Marcações de hoje</h2><div class="small" id="daySubtitle">Seis registros por dia útil</div></div><div style="max-width:150px"><select id="daySelect" aria-label="Selecionar dia"></select></div></div>
+  <div class="progress"><span id="progress"></span></div><div class="small" id="progressText">0 de 6 marcações</div>
+  <div class="marks" id="marks"></div>
+  <div class="row noprint" style="margin-top:9px"><button class="secondary" id="undo">Desfazer última</button><button class="secondary" id="clearDay">Limpar dia</button></div>
+ </section>
+ <section class="card">
+  <div class="row"><h2 style="margin:0">Resumo semanal</h2><div class="row noprint" style="flex:0 0 auto"><button class="secondary" id="prev">‹</button><button class="secondary" id="next">›</button></div></div>
+  <p class="small" id="weekLabel"></p>
+  <div class="tablewrap"><table><thead><tr><th>Dia</th><th>Entrada</th><th>Pausa 1</th><th>Retorno 1</th><th>Almoço</th><th>Retorno</th><th>Saída</th></tr></thead><tbody id="weekTable"></tbody></table></div>
+  <div class="row noprint" style="margin-top:12px"><button id="print" class="secondary">Imprimir / salvar PDF</button><button id="csv" class="secondary">Baixar tabela CSV</button></div>
+ </section>
+
+ <div class="notice" style="margin-top:14px">Os horários são registrados pelo relógio do aparelho e ficam armazenados apenas neste navegador. Não são enviados à empresa nem substituem o registro oficial. Se limpar os dados do navegador ou trocar de aparelho, os registros locais podem ser perdidos. Exporte sua tabela regularmente.</div>
+ <footer>Meu Ponto · uso pessoal · segunda a sexta</footer>
+</main>
+<script>
+const defaultLabels=['Entrada','Saída pausa 1','Retorno pausa 1','Saída almoço','Retorno almoço','Saída final'];
+const labels=['Entrada','Saída Almoço','Retorno Almoço','Lanche Saída','Lanche Retorno','Saída final'];
+let records=JSON.parse(localStorage.getItem('mp_records')||'{}');
+let selectedDate=iso(new Date()), weekOffset=0;
+function iso(d){return [d.getFullYear(),String(d.getMonth()+1).padStart(2,'0'),String(d.getDate()).padStart(2,'0')].join('-')}
+function fromISO(s){let [y,m,d]=s.split('-').map(Number);return new Date(y,m-1,d)}
+function fmtDate(s,opt={weekday:'long',day:'2-digit',month:'2-digit'}){return fromISO(s).toLocaleDateString('pt-BR',opt)}
+function save(){localStorage.setItem('mp_records',JSON.stringify(records))}
+function times(s){return records[s]||[]}
+function tick(){let n=new Date();document.getElementById('clock').textContent=n.toLocaleTimeString('pt-BR');document.getElementById('today').textContent=n.toLocaleDateString('pt-BR',{weekday:'long',day:'numeric',month:'long',year:'numeric'})}
+function renderDay(){
+ let arr=times(selectedDate);document.getElementById('dayTitle').textContent=fmtDate(selectedDate,{weekday:'long',day:'2-digit',month:'long'});
+ document.getElementById('daySubtitle').textContent=selectedDate===iso(new Date())?'Dia selecionado · hoje':'Dia selecionado';
+ document.getElementById('progress').style.width=(arr.length/6*100)+'%';document.getElementById('progressText').textContent=arr.length+' de 6 marcações';
+ document.getElementById('marks').innerHTML=labels.map((l,i)=>`<div class="mark ${arr[i]?'done':''}"><div class="label">${i+1}. ${esc(l)}</div><div class="value">${arr[i]||'— — : — —'}</div><button class="secondary" data-edit="${i}">${arr[i]?'Editar horário':'Adicionar manualmente'}</button></div>`).join('');
+ document.querySelectorAll('[data-edit]').forEach(b=>b.onclick=()=>editMark(Number(b.dataset.edit)));
+ let btn=document.getElementById('record');btn.disabled=arr.length>=6;btn.textContent=arr.length>=6?'Seis marcações registradas':'Registrar '+labels[arr.length]+' · agora';document.getElementById('nextLabel').textContent=arr.length>=6?'Todos os pontos deste dia já foram registrados.': 'Próximo registro: '+labels[arr.length]+'. Toque para capturar a hora atual.';
+}
+function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function recordNow(){let a=times(selectedDate);if(a.length>=6)return;a.push(new Date().toLocaleTimeString('pt-BR'));records[selectedDate]=a;save();renderAll()}
+function editMark(i){let a=times(selectedDate).slice();let old=a[i]||'';let v=prompt('Informe o horário para "'+labels[i]+'" (HH:MM ou HH:MM:SS). Deixe vazio para remover.',old);if(v===null)return;v=v.trim();if(v&&!/^([01]\d|2[0-3]):[0-5]\d(:[0-5]\d)?$/.test(v)){alert('Use o formato HH:MM ou HH:MM:SS.');return}if(v){while(a.length<=i)a.push('');a[i]=v}else if(i<a.length){a.splice(i,1);while(a.length&&a[a.length-1]==='')a.pop()}records[selectedDate]=a;save();renderAll()}
+function monday(d){let x=new Date(d.getFullYear(),d.getMonth(),d.getDate());let day=(x.getDay()+6)%7;x.setDate(x.getDate()-day+weekOffset*7);return x}
+function renderWeek(){let start=monday(new Date());let end=new Date(start);end.setDate(start.getDate()+4);document.getElementById('weekLabel').textContent=fmtDate(iso(start),{day:'2-digit',month:'short'})+' – '+fmtDate(iso(end),{day:'2-digit',month:'short',year:'numeric'});
+ let rows='';for(let i=0;i<5;i++){let d=new Date(start);d.setDate(start.getDate()+i);let s=iso(d),a=times(s);rows+=`<tr><td>${fmtDate(s,{weekday:'short',day:'2-digit',month:'2-digit'})}</td>${Array.from({length:6},(_,j)=>`<td>${a[j]||'—'}</td>`).join('')}</tr>`}document.getElementById('weekTable').innerHTML=rows}
+function renderAll(){renderDay();renderWeek()}
+document.getElementById('record').onclick=recordNow;
+document.getElementById('undo').onclick=()=>{let a=times(selectedDate).slice();if(a.length){a.pop();records[selectedDate]=a;save();renderAll()}};
+document.getElementById('clearDay').onclick=()=>{if(confirm('Apagar todas as marcações deste dia?')){delete records[selectedDate];save();renderAll()}};
+document.getElementById('daySelect').innerHTML=Array.from({length:5},(_,i)=>{let d=new Date();d.setDate(d.getDate()-((d.getDay()+6)%7)+i);let s=iso(d);return `<option value="${s}">${fmtDate(s,{weekday:'short',day:'2-digit'})}</option>`}).join('');
+document.getElementById('daySelect').onchange=e=>{selectedDate=e.target.value;renderDay()};
+document.getElementById('prev').onclick=()=>{weekOffset--;renderWeek()};
+document.getElementById('next').onclick=()=>{weekOffset++;renderWeek()};
+document.getElementById('print').onclick=()=>window.print();
+document.getElementById('csv').onclick=()=>{let start=monday(new Date());let lines=[['Dia',...labels].join(';')];for(let i=0;i<5;i++){let d=new Date(start);d.setDate(start.getDate()+i);let s=iso(d);lines.push([fmtDate(s),...Array.from({length:6},(_,j)=>times(s)[j]||'')].join(';'))}let blob=new Blob(['\ufeff'+lines.join('\r\n')],{type:'text/csv;charset=utf-8'});let url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='meu-ponto-semana.csv';a.click();URL.revokeObjectURL(url)};
+renderAll();tick();setInterval(tick,1000);
+</script>
+<script>
+if ("serviceWorker" in navigator && location.protocol.startsWith("http")) {
+  window.addEventListener("load", () => navigator.serviceWorker.register("./sw.js").catch(()=>{}));
+}
+</script>
+</body></html>
